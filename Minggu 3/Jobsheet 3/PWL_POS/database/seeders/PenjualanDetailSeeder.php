@@ -53,6 +53,22 @@ class PenjualanDetailSeeder extends Seeder
             ['detail_id' => 28, 'penjualan_id' => 10, 'barang_id' => 8, 'harga' => 25000, 'jumlah' => 3],
             ['detail_id' => 29, 'penjualan_id' => 10, 'barang_id' => 9, 'harga' => 40000, 'jumlah' => 1],
             ['detail_id' => 30, 'penjualan_id' => 10, 'barang_id' => 10, 'harga' => 150000, 'jumlah' => 1],
+            
+            ['detail_id' => 31, 'penjualan_id' => 11, 'barang_id' => 11, 'harga' => 100000, 'jumlah' => 1],
+            ['detail_id' => 32, 'penjualan_id' => 11, 'barang_id' => 12, 'harga' => 200000, 'jumlah' => 1],
+            ['detail_id' => 33, 'penjualan_id' => 11, 'barang_id' => 13, 'harga' => 300000, 'jumlah' => 1],
+
+            ['detail_id' => 34, 'penjualan_id' => 12, 'barang_id' => 14, 'harga' => 400000, 'jumlah' => 1],
+            ['detail_id' => 35, 'penjualan_id' => 12, 'barang_id' => 15, 'harga' => 500000, 'jumlah' => 1],
+            ['detail_id' => 36, 'penjualan_id' => 12, 'barang_id' => 16, 'harga' => 600000, 'jumlah' => 1],
+
+            ['detail_id' => 37, 'penjualan_id' => 13, 'barang_id' => 17, 'harga' => 700000, 'jumlah' => 1],
+            ['detail_id' => 38, 'penjualan_id' => 13, 'barang_id' => 18, 'harga' => 800000, 'jumlah' => 1],
+            ['detail_id' => 39, 'penjualan_id' => 13, 'barang_id' => 19, 'harga' => 900000, 'jumlah' => 1],
+
+            ['detail_id' => 40, 'penjualan_id' => 14, 'barang_id' => 20, 'harga' => 1000000, 'jumlah' => 1],
+            ['detail_id' => 41, 'penjualan_id' => 14, 'barang_id' => 21, 'harga' => 1100000, 'jumlah' => 1],
+            ['detail_id' => 42, 'penjualan_id' => 14, 'barang_id' => 22, 'harga' => 1200000, 'jumlah' => 1],
         ]);
     }
 }
