@@ -40,7 +40,33 @@ class UserController extends Controller
         
         //$user = UserModel::findOrFail(1);
         //$user = UserModel::where('username', 'manager9')->firstOrFail();
-        $user = UserModel::where('level_id', 2) ->count(); 
+        //$user = UserModel::where('level_id', 2) ->count(); 
+
+        //'username'=> 'manager',
+        //'nama' => 'Manager',
+        
+        // Cari user berdasarkan username, jika tidak ada, buat user baru dengan password yang dienkripsi
+         //$user = UserModel::firstOrCreate(
+            //['username' => 'manager22'], // Pencarian berdasarkan username
+            //[
+                //'nama' => 'Manager Dua Dua',
+                //'password' => Hash::make('12345'), // Pastikan password dienkripsi
+                //'level_id' => 2
+            //]
+
+                //'username' => 'manager',
+                 //'nama' => 'Manager',
+
+            $user = UserModel::firstOrNew(
+                [
+                    'username' => 'manager33',
+                    'nama' => 'Manager Tiga Tiga',
+                    'password' => Hash::make('12345'),
+                    'level_id' => 2
+                ],
+            );
+            $user->save(); // Simpan data user baru
+
         return view('user', ['data' => $user]);
     }
 }
