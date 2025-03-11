@@ -10,6 +10,9 @@ class UserController extends Controller
 {
     public function index()
     {
+        $user = UserModel::with('level')->get(); // Mengambil semua data dari tabel m_user
+        return view('user',['data' => $user]);
+}
        
         //tambah data user dengan Eloquent Model
         //$data = [
@@ -100,9 +103,11 @@ class UserController extends Controller
                     //$user->wasChanged('nama'); // false
                     //dd($user->wasChanged(['nama', 'username']));//true
 
-                $user = UserModel::all(); // Mengambil semua data dari tabel m_user
-                return view('user',['data' => $user]); 
-    }
+                //$user = UserModel::all(); // Mengambil semua data dari tabel m_user
+                //return view('user',['data' => $user]);
+                // dd($user);
+                
+               
 
     public function tambah() 
     {
