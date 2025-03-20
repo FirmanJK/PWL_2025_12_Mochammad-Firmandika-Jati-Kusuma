@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+
 use App\Models\KategoriModel;
 use Illuminate\Http\Request;
 use App\DataTables\KategoriDataTable;
@@ -18,11 +19,62 @@ class KategoriController extends Controller
 
     public function store(Request $request)
     {
-        KategoriModel::create([
-            'kategori_kode' => $request->kodeKategori,
-            'kategori_nama' => $request->namaKategori,
+        // Validasi input sebelum menyimpan
+        $request->validate([
+            'kategoriKode' => 'required|unique:m_kategori,kategori_kode',
+            'kategoriNama' => 'required',
         ]);
-        return redirect('/kategori');
+
+        // Simpan data ke tabel
+        KategoriModel::create([
+            'kategori_kode' => $request->kategoriKode,
+            'kategori_nama' => $request->kategoriNama,
+        ]);
+
+        // Redirect ke halaman index dengan pesan sukses
+        return redirect()->route('kategori.index')
+            ->with('success', 'Kategori berhasil ditambahkan!');
+    }
+
+    public function edit($id) 
+    {
+        // Ambil data kategori berdasarkan ID
+        $kategori = KategoriModel::findOrFail($id);
+
+        return view('kategori.edit', compact('kategori'));
+    }
+
+    public function update(Request $request, $id) 
+    {
+        // Validasi input
+        $request->validate([
+            'kategoriKode' => 'required|unique:m_kategori,kategori_kode,' . $id . ',kategori_id',
+            'kategoriNama' => 'required',
+        ]);
+
+        // Ambil data kategori berdasarkan ID
+        $kategori = KategoriModel::findOrFail($id);
+
+        // Update data kategori
+        $kategori->update([
+            'kategori_kode' => $request->kategoriKode,
+            'kategori_nama' => $request->kategoriNama,
+        ]);
+
+        // Redirect ke halaman index dengan pesan sukses
+        return redirect('/kategori')
+        ->with('success', 'Kategori berhasil diperbarui!');
+
+    }
+
+    public function destroy($id) 
+    {
+        // Hapus data kategori berdasarkan ID
+        KategoriModel::destroy($id);
+
+        // Redirect ke halaman index dengan pesan sukses
+        return redirect('/kategori')
+        ->with('success', 'Kategori berhasil dihapus!');
     }
 }
 

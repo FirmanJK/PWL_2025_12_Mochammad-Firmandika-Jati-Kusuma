@@ -327,6 +327,10 @@ return [
             'label' => 4,
             'label_color' => 'success',
         ],
+        ['text' => 'Manage Kategori',
+            'url' => '/kategori',
+            'icon' => 'fas fa-list',
+        ],
         ['header' => 'account_settings'],
         [
             'text' => 'profile',

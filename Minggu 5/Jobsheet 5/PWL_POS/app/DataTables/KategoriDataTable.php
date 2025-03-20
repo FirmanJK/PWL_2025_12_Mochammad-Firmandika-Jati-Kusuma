@@ -21,9 +21,25 @@ class KategoriDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable 
     { 
         return (new EloquentDataTable($query)) 
-/*             ->addColumn('action', 'kategori.action') */ 
+/*             ->addColumn('action', 'kategori.action') */
+        ->addColumn('action', function($row){
+            $editUrl = route('kategori.edit',  $row->kategori_id);
+            $deleteUrl = route('kategori.destroy',  $row->kategori_id);
+
+            return 
+            '<a href="'.$editUrl.'" class="btn btn-sm btn-primary">Edit</a>
+            <form action="'. $deleteUrl .'" method="POST" style="display:inline;">
+            '. csrf_field() .'
+            '. method_field("DELETE") .'
+            <button class="btn btn-sm btn-danger" onclick="return confirm(\'Apa anda yakin?\')">
+                Delete
+            </button>
+        </form>
+        ';
+    }) 
+            ->rawColumns(['action'])
             ->setRowId('id'); 
-    } 
+    }
  
     /** 
      * Get the query source of dataTable. 
@@ -66,13 +82,19 @@ class KategoriDataTable extends DataTable
                   ->printable(false) 
                   ->width(60) 
                   ->addClass('text-center'), */ 
-            Column::make('kategori_id'), 
-            Column::make('kategori_kode'), 
-            Column::make('kategori_nama'), 
-            Column::make('created_at'), 
-            Column::make('updated_at'), 
-        ]; 
-    } 
+            Column::make('kategori_id'),
+            Column::make('kategori_kode'),
+            Column::make('kategori_nama'),
+            Column::make('created_at'),
+            Column::make('updated_at'),
+            Column::make('updated_at'),
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(60)
+                ->addClass('text-center'),
+    ];
+}
  
     /** 
      * Get the filename for export. 

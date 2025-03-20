@@ -13,7 +13,7 @@
                 <h3 class="card-title">Buat kategori baru</h3>
             </div>
 
-            <form method="post" action="/kategori">
+            <form method="post" action={{ url('/kategori') }}>
                 <div class="card-body">
                     <div class="form-group">
                         <label for="kodeKategori">Kode Kategori</label>
