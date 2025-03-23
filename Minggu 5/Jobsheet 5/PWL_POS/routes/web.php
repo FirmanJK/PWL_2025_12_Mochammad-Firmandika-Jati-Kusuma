@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
+Route::get('/', [WelcomeController::class, 'index']);
 //Route::get('/', function () {
 //    return view('welcome');
 //});
-Route::get('/', [WelcomeController::class, 'index']);
+
 Route::get('/level', [LevelController::class, 'index']);
 Route::get('/kategori/create', [KategoriController::class, 'create']);
 Route::post('/kategori', [KategoriController::class, 'store']);
