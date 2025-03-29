@@ -5,7 +5,9 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
-                <a class="btn btn-sm btn-primary mt-1" href="{{ url('barang/create') }}">Tambah</a>               
+                <a class="btn btn-sm btn-primary mt-1" href="{{ url('barang/create') }}">Tambah</a>
+                <button onclick="modalAction('{{ url('barang/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah
+                    Ajax</button>
             </div>
         </div>
         <div class="card-body">
@@ -14,20 +16,7 @@
                     {{ session('error') }}
                 </div>
             @endif
-            <div class="col-md-12">
-                <div class="form-group row">
-                    <label class="col-1 control-label col-form-label">Filter:</label>
-                    <div class="col-3">
-                        <select class="form-control" id="kategori_id" name="kategori_id" required>
-                            <option value="">- Semua -</option>
-                            @foreach($kategori as $kat)
-                                <option value="{{ $kat->kategori_id }}">{{ $kat->kategori_id }}</option>
-                            @endforeach
-                        </select>
-                        <small class="form-text text-muted">Filter berdasarkan kategori</small>
-                    </div>
-                </div>
-            </div>
+            
             @if(session('success'))
                 <div class="alert alert-success">
                     {{ session('success') }}
@@ -114,7 +103,8 @@
                         orderable: false,
                         searchable: false
                     },]
-            });           
+            });
+           
         });
     </script>
 @endpush
