@@ -76,6 +76,10 @@
             </li>
           </a>
         </li>
+        @auth
+        <button id="btn-logout" type="button" class="btn btn-danger btn-sm">Logout</button>
+        @endauth
+       
       </ul> 
     </nav> 
   </div>  

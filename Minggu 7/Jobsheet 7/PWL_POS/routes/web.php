@@ -37,7 +37,7 @@ use App\Http\Controllers\SupplierController;
 //Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
 //--------------------------------------------Jobsheet 5--------------------------------
-Route::get('/', [WelcomeController::class, 'index']);
+//Route::get('/', [WelcomeController::class, 'index']);
 
 //Route::group(['prefix' => 'user'], function () {
     //Route::get('/', [UserController::class, 'index']);             // menampilkan halaman awal user
@@ -207,12 +207,8 @@ Route::get('/', [WelcomeController::class, 'index']);
 //     //--------------------------------------------------------------------------------------------------------------
 //     Route::delete('/{id}', [BarangController::class, 'destroy']);
 // });
-
+//      --------------------------------------------Jobsheet 7--------------------------------
 Route::pattern('id', '[0-9]+'); //jika ada parameter id, maka harus berupa angka
-
-// register
-Route::get('register', [AuthController::class, 'register'])->name('register');
-Route::post('register', [AuthController::class, 'postRegister']);
 // login
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
