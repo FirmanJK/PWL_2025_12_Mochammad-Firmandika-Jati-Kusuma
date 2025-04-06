@@ -57,6 +57,7 @@
                         <!-- /.col -->
                     </div>
                 </form>
+                <a href="{{ route('register') }}" class="text-center">Belum punya akun?</a>
             </div>
             <!-- /.card-body -->
         </div>

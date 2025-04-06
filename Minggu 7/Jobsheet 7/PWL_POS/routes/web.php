@@ -209,6 +209,9 @@ use App\Http\Controllers\SupplierController;
 // });
 //      --------------------------------------------Jobsheet 7--------------------------------
 Route::pattern('id', '[0-9]+'); //jika ada parameter id, maka harus berupa angka
+// register
+Route::get('register', [AuthController::class, 'register'])->name('register');
+Route::post('register', [AuthController::class, 'postRegister']);
 // login
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
