@@ -303,6 +303,8 @@ Route::middleware(['auth'])->group(function () { //artinya semua route di dalam 
             Route::get('/{id}/delete_ajax', [BarangController::class, 'confirm_ajax']); // untuk tampilan form confirm delete Barang ajax
             Route::delete('/{id}/delete_ajax', [BarangController::class, 'delete_ajax']); // menghapus data Barang ajax
             Route::delete('/{id}', [BarangController::class, 'destroy']); // menghapus data Barang
+            Route::get('/import', [BarangController::class, 'import']); // menampilkan halaman form import Barang
+            Route::post('/import_ajax', [BarangController::class, 'import_ajax']); // menyimpan data Barang dari file import
         });
     });
 
