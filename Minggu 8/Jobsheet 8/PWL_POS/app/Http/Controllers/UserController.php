@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use function Laravel\Prompts\password;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 
@@ -476,5 +477,97 @@ class UserController extends Controller
             }
         }
         return redirect('/');
+    }
+
+    public function import() {
+    return view('user.import');
+    }
+
+    public function import_ajax(Request $request){
+    if ($request->ajax() || $request->wantsJson()) {
+
+        $rules = [
+            // Validasi file harus xlsx, maksimal 1MB
+            'file_user' => ['required', 'mimes:xlsx', 'max:1024']
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'   => false,
+                'message'  => 'Validasi Gagal',
+                'msgField' => $validator->errors()
+            ]);
+        }
+
+        // Ambil file dari request
+        $file = $request->file('file_user');
+
+        // Membuat reader untuk file excel dengan format Xlsx
+        $reader = IOFactory::createReader('Xlsx');
+        $reader->setReadDataOnly(true); // Hanya membaca data saja
+
+        // Load file excel
+        $spreadsheet = $reader->load($file->getRealPath());
+        $sheet = $spreadsheet->getActiveSheet(); // Ambil sheet yang aktif
+
+        // Ambil data excel sebagai array
+        $data = $sheet->toArray(null, false, true, true);
+        $insert = [];
+        $errors = [];
+
+        // Pastikan data memiliki lebih dari 1 baris (header + data)
+        if (count($data) > 1) {
+            // Pertama, validasi setiap baris level_id
+            foreach ($data as $baris => $value) {
+                if ($baris > 1) { // Baris pertama adalah header, jadi lewati
+                    $levelId = $value['A'];
+                    // Cek apakah level_id ada di tabel m_level
+                    if (!LevelModel::where('level_id', $levelId)->exists()) {
+                        $errors["baris_$baris"] = "Level dengan ID {$levelId} tidak terdaftar.";
+                    }
+                }
+            }
+
+            // Jika ada error validasi kategori, kembalikan response error
+            if (count($errors) > 0) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi kategori gagal',
+                    'msgField' => $errors
+                ]);
+            }
+
+            foreach ($data as $baris => $value) {
+                if ($baris > 1) { // Baris pertama adalah header, jadi lewati
+                    $insert[] = [
+                        'level_id' => $value['A'],
+                        'username' => $value['B'],
+                        'nama' => $value['C'],
+                        'password' => bcrypt($value['D']),
+                        'created_at'  => now(),
+                    ];
+                }
+            }
+
+            if (count($insert) > 0) {
+                // Insert data ke database, jika data sudah ada, maka diabaikan
+                UserModel::insertOrIgnore($insert);
+            }
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Data berhasil diimport'
+            ]);
+        } else {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Tidak ada data yang diimport'
+            ]);
+        }
+    }
+    
+     return redirect('/');
     }
 }        
