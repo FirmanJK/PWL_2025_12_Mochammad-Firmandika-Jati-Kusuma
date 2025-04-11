@@ -344,4 +344,58 @@ class SupplierController extends Controller
         }
         return redirect('/');
     }
+
+    public function export_excel()
+    {
+        //Ambil value barang yang akan diexport
+        $supplier = SupplierModel::select(
+            'supplier_kode',
+            'supplier_nama',
+            'supplier_alamat'
+        )
+        ->orderBy('supplier_id')
+        ->get();
+
+        //load library excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); //ambil sheet aktif
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Supplier');
+        $sheet->setCellValue('C1', 'Nama Supplier');
+        $sheet->setCellValue('D1', 'Alamat Supplier');
+
+        $sheet->getStyle('A1:D1')->getFont()->setBold(true); // Set header bold
+
+        $no = 1; //Nomor value dimulai dari 1
+        $baris = 2; //Baris value dimulai dari 2
+        foreach ($supplier as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->supplier_kode);
+            $sheet->setCellValue('C' . $baris, $value->supplier_nama);
+            $sheet->setCellValue('D' . $baris, $value->supplier_alamat);
+            $no++;
+            $baris++;
+        }
+
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true); //set auto size untuk kolom
+        }
+
+        $sheet->setTitle('Data Supplier'); //set judul sheet
+        $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
+        $filename = 'Data_Supplier_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output'); //simpan file ke output
+        exit; //keluar dari scriptA
+    }
 }

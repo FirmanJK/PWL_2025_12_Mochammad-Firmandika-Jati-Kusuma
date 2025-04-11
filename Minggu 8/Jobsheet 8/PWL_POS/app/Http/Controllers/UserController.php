@@ -478,7 +478,8 @@ class UserController extends Controller
         }
         return redirect('/');
     }
-
+    //----------------------------------------------------------Jobsheet 8----------------------------------------------------
+    //----------------------------------------------------------Praktikum 1----------------------------------------------------
     public function import() {
     return view('user.import');
     }
@@ -569,5 +570,61 @@ class UserController extends Controller
     }
     
      return redirect('/');
+    }
+    
+    //----------------------------------------------------------Praktikum 2----------------------------------------------------
+    public function export_excel()
+    {
+        //Ambil value user yang akan diexport
+        $user = UserModel::select(
+            'level_id',
+            'username',
+            'nama',
+        )
+        ->orderBy('level_id')
+        ->with('level')
+        ->get();
+
+        //load library excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); //ambil sheet aktif
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Username');
+        $sheet->setCellValue('C1', 'Nama User');
+        $sheet->setCellValue('D1', 'Level');
+
+        $sheet->getStyle('A1:D1')->getFont()->setBold(true); // Set header bold
+
+        $no = 1; //Nomor value dimulai dari 1
+        $baris = 2; //Baris value dimulai dari 2
+        foreach ($user as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->username);
+            $sheet->setCellValue('C' . $baris, $value->nama);
+            $sheet->setCellValue('D' . $baris, $value->level->level_nama);
+            $no++;
+            $baris++;
+        }
+
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true); //set auto size untuk kolom
+        }
+
+        $sheet->setTitle('Data User'); //set judul sheet
+        $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
+        $filename = 'Data_User_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output'); //simpan file ke output
+        exit; //keluar dari scriptA
     }
 }        

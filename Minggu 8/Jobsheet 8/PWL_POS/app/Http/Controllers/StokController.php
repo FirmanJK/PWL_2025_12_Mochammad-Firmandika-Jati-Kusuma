@@ -283,7 +283,7 @@ class StokController extends Controller
                             ]);
                         }
 
-                        $tanggal_masuk = is_numeric($value['D'])
+                        $stok_tanggal = is_numeric($value['D'])
                             ? Date::excelToDateTimeObject($value['D'])->format('Y-m-d')
                             : date('Y-m-d', strtotime($value['D']));
 
@@ -291,9 +291,9 @@ class StokController extends Controller
                             'barang_id'           => $value['A'],
                             'user_id'             => $value['B'],
                             'supplier_id'         => $value['C'],
-                            'stok_tanggal'  => $tanggal_masuk,
+                            'stok_tanggal'        => $value['D'],
                             'stok_jumlah'         => $value['E'],
-                            'created_at'           => now(),
+                            'created_at'          => now(),
                         ];
                     }
                 }
@@ -314,7 +314,67 @@ class StokController extends Controller
                 ]);
             }
         }
-
         return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        //Ambil value stok yang akan diexport
+        $stok = StokModel::select(
+            'barang_id',
+            'user_id',
+            'supplier_id',
+            'stok_tanggal',
+            'stok_jumlah'
+        )
+        ->orderBy('stok_id')
+        ->with(['barang', 'user', 'supplier'])
+        ->get();
+
+        //load library excel
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); //ambil sheet aktif
+
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Nama Barang');
+        $sheet->setCellValue('C1', 'Nama User');
+        $sheet->setCellValue('D1', 'Nama Supplier');
+        $sheet->setCellValue('E1', 'Tanggal Masuk');
+        $sheet->setCellValue('F1', 'Jumlah Stok');
+
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true); // Set header bold
+
+        $no = 1; //Nomor value dimulai dari 1
+        $baris = 2; //Baris value dimulai dari 2
+        foreach ($stok as $key => $value) {
+            $sheet->setCellValue('A' . $baris, $no);
+            $sheet->setCellValue('B' . $baris, $value->barang->barang_nama);
+            $sheet->setCellValue('C' . $baris, $value->user->nama);
+            $sheet->setCellValue('D' . $baris, $value->supplier->supplier_nama);
+            $sheet->setCellValue('E' . $baris, $value->stok_tanggal);
+            $sheet->setCellValue('F' . $baris, $value->stok_jumlah);
+            $no++;
+            $baris++;
+        }
+
+        foreach (range('A', 'F') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true); //set auto size untuk kolom
+        }
+
+        $sheet->setTitle('Data Stock Barang'); //set judul sheet
+        $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
+        $filename = 'Data_Stock_Barang_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+
+        $writer->save('php://output'); //simpan file ke output
+        exit; //keluar dari scriptA
     }
 }

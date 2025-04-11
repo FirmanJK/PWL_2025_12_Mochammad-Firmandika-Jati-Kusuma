@@ -272,7 +272,6 @@ Route::middleware(['auth'])->group(function () { //artinya semua route di dalam 
         });
     });
 
-
     Route::middleware(['authorize:ADM,MNG'])->group(function () {
         Route::group(['prefix' => 'kategori'], function () {
             Route::get('/', [KategoriController::class, 'index']); // menampilkan halaman awal Kategori
