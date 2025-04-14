@@ -9,6 +9,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -224,6 +225,15 @@ Route::middleware(['auth'])->group(function () { //artinya semua route di dalam 
 
     Route::get('/', [WelcomeController::class, 'index']);
     // Route Level
+
+    //Semua bisa ke halaman dashboard
+    Route::middleware(['authorize:ADM,MNG,STF,KSR,SPV'])->group(function () {
+        Route::middleware(['authorize:ADM,MNG,STF,KSR,SPV'])->group(function () {
+            Route::get('/profile', [ProfileController::class, 'profil'])->name('profil');  
+            Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+        });        
+    });
 
     // Artinya semua role di dalam group ini harus punya rle ADM (Administrator)
     Route::middleware(['authorize:ADM'])->group(function () {

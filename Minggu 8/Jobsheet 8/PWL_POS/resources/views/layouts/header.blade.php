@@ -5,7 +5,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-        <a href="../../index3.html" class="nav-link">Home</a>
+        <a href="{{ url('/') }}" class="nav-link">Home</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
         <a href="#" class="nav-link">Contact</a>
@@ -14,6 +14,40 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
+      <!-- User Dropdown -->
+      <li class="nav-item dropdown user-menu mt-1 mr-5">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+            @if (Auth::user()->profile_photo)
+                <img src="{{ asset('storage/profile/' . Auth::user()->profile_photo) }}" class="user-image img-circle elevation-2" alt="User Image">
+            @else
+                <img src="{{ asset('Foto.jpg') }}" class="user-image img-circle elevation-2" alt="Default Image">
+            @endif
+            <span class="d-none d-md-inline">{{ Auth::user()->nama }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <!-- User image -->
+            <li class="user-header bg-primary p-3 mt-1">
+                @if (Auth::user()->profile_photo)
+                    <img src="{{ asset('storage/profile/' . Auth::user()->profile_photo) }}" class="user-image img-circle elevation-2" alt="User Image">
+                @else
+                    <img src="{{ asset('Foto.jpg') }}" class="user-image img-circle elevation-2 mt-3" alt="Default Image">
+                @endif
+                <p>
+                    {{ Auth::user()->nama }}
+                    <small>{{ Auth::user()->getRoleName() }}</small>
+                </p>
+            </li>
+            <!-- Menu Footer-->
+            <li class="user-footer">
+                <a href="#" class="fas fa-sign-out-alt mr-2"
+                  onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+                <form id="logout-form" action="{{ url('/logout') }}" method="GET" style="display: none;">
+                    @csrf
+                </form>
+            </li>
+        </ul>
+      </li>
+
       <!-- Navbar Search -->
       <li class="nav-item">
         <a class="nav-link" data-widget="navbar-search" href="#" role="button">
