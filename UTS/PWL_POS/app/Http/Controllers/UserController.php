@@ -20,7 +20,7 @@ class UserController extends Controller
 {
 
             //----------------------------------------------------Jobsheet 3 - Migration--------------------------------------------------------------------
-            $user = UserModel::find(1);
+            $user = UserModel::findOrFail(1);
             return view('user', ['data' => $user]);
     }
 }        
