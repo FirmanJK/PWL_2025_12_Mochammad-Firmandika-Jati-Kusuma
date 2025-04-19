@@ -17,31 +17,24 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class UserController extends Controller
 {
     public function index()
-    {
-        $user = UserModel::create([
-            'username' => 'manager56',
-            'name' => 'Manager55',
-            'password' => Hash::make('12345'),
-            'level_id' => 2,
-        ]);
-        
-        $user->username = 'manager56';
-        
-        $user->isDirty(); // true
-        $user->isDirty('username'); // true
-        $user->isDirty('name'); // false
-        $user->isDirty(['name', 'username']); // true
-        
-        $user->isClean(); // false
-        $user->isClean('username'); // false
-        $user->isClean('name'); // true
-        $user->isClean(['name', 'username']); // false
-        
-        $user->save();
-        
-        $user->isDirty(); // false
-        $user->isClean(); // true
-        
-        dd($user->isDirty());
-    }
+{
+    $breadcrumb = (object) [
+        'title' => "Online user",
+        'list' => ["home", "User"]
+    ];
+    
+    $page = (object) [
+        'title' => "Online user yang terdaftar dalam sistem"
+    ];
+    
+    $activeMenu = 'user'; // set menu yang aktif
+    $level = LevelModel::all(); // ambil data level untuk filter dropdown
+    
+    return view('user.index', [
+        'breadcrumb' => $breadcrumb,
+        'page' => $page,
+        'level' => $level,
+        'activeMenu' => $activeMenu
+    ]);
+}
 }
