@@ -14,6 +14,7 @@ return new class extends Migration
         
         Schema::create('t_stok', function (Blueprint $table) {
             $table->id('stok_id');
+            $table->unsignedBigInteger('supplier_id');
             $table->unsignedBigInteger('barang_id');
             $table->unsignedBigInteger('user_id');
             $table->dateTime('stok_tanggal');
