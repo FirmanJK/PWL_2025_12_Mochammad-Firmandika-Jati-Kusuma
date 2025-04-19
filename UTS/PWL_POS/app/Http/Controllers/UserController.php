@@ -20,8 +20,13 @@ class UserController extends Controller
 {
 
             //----------------------------------------------------Jobsheet 3 - Migration--------------------------------------------------------------------
-            $user = UserModel::where('level_id', 1)->count();
-            dd($user);
+            $user = UserModel::firstOrCreate(
+                ['user_id' => 1],
+                [
+                    'username' => 'manager',
+                    'nama' => 'Manager',
+                ]
+            );
             return view('user', ['data' => $user]);
     }
 }        
