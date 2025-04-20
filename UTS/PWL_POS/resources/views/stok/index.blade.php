@@ -115,7 +115,7 @@ $(document).ready(function() {
             },
             {
                 // Menampilkan nama barang (asumsikan relasi: stok -> barang)
-                data: "barang.barang_nama",
+                data: "barang_nama",
                 orderable: true,
                 searchable: true
             },
@@ -127,7 +127,7 @@ $(document).ready(function() {
             },
             {
                 // Menampilkan nama supplier (asumsikan relasi: stok -> supplier)
-                data: "supplier.supplier_nama",
+                data: "supplier_nama",
                 orderable: true,
                 searchable: true
             },

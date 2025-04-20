@@ -36,42 +36,48 @@ class StokController extends Controller
         return view('stok.index', ['breadcrumb' => $breadcrumb, 'barang' => $barang, 'user'=> $user, 'supplier' => $supplier, 'page' => $page,'activeMenu' => $activeMenu]);
     }
 
-    public function list(Request $request){
-        $stoks = StokModel::select('stok_id', 'barang_id', 'user_id', 'supplier_id', 'stok_tanggal', 'stok_jumlah')
-        ->with(['barang', 'user', 'supplier']);
-
-        $barang_id = $request->input('barang_id');
-        if (!empty($barang_id)) {
-            $stoks->where('barang_id', $barang_id);
+    public function list(Request $request)
+    {
+        $stoks = StokModel::select('stok_id', 'supplier_id', 'barang_id', 'user_id', 'stok_tanggal', 'stok_jumlah')
+            ->with(['barang', 'user', 'supplier']);
+    
+        if ($request->filled('barang_id')) {
+            $stoks->where('barang_id', $request->barang_id);
         }
-
-        $user_id = $request->input('user_id');
-        if (!empty($user_id)) {
-            $stoks->where('user_id', $user_id);
+    
+        if ($request->filled('user_id')) {
+            $stoks->where('user_id', $request->user_id);
         }
-
-        $supplier_id = $request->input('supplier_id');
-        if (!empty($supplier_id)) {
-            $stoks->where('supplier_id', $supplier_id);
+    
+        if ($request->filled('supplier_id')) {
+            $stoks->where('supplier_id', $request->supplier_id);
         }
-
+    
         return DataTables::of($stoks)
-
-        ->addIndexColumn() // menambahkan kolom index / no urut (default nama kolom:DT_RowIndex)
-        ->addColumn('aksi', function ($stoks) { // menambahkan kolom aksi
-            /* $btn = '<a href="'.url('/stok/' . $stoks->stok_id).'" class="btn btn-info btnsm">Detail</a> ';
-            $btn .= '<a href="'.url('/stok/' . $stoks->stok_id . '/edit').'" class="btn btnwarning btn-sm">Edit</a> ';
-            $btn .= '<form class="d-inline-block" method="POST" action="'. url('/stok/'.$stoks-
-            >stok_id).'">'
-            . csrf_field() . method_field('DELETE') .
-            '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakit menghapus data ini?\');">Hapus</button></form>';*/
-            $btn = '<button onclick="modalAction(\'' . url('/stok/' . $stoks->stok_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
-            $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stoks->stok_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-            $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stoks->stok_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
-            return $btn;
-        })->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
-        ->make(true);
-    }
+            ->addIndexColumn()
+    
+            // ✅ Tambahkan kolom supplier_nama (biar bisa dipanggil langsung di JS)
+            ->addColumn('supplier_nama', function ($stok) {
+                return $stok->supplier->supplier_nama ?? '-';
+            })
+    
+            // ✅ (opsional) Tambahkan juga barang_nama dan user_nama untuk tampil di tabel
+            ->addColumn('barang_nama', function ($stok) {
+                return $stok->barang->barang_nama ?? '-';
+            })
+            ->addColumn('user_nama', function ($stok) {
+                return $stok->user->nama ?? '-';
+            })
+    
+            ->addColumn('aksi', function ($stok) {
+                $btn = '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
+    }    
 
     public function show_ajax(string $id)
     {
