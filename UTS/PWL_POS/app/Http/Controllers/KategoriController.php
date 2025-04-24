@@ -3,27 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\KategoriModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
-use Barryvdh\DomPDF\Facade\Pdf;
 // use Illuminate\Support\Facades\Hash;
 
 class KategoriController extends Controller
 {
     public function index()
     {
-        /*$data = [
-            'kategori_kode' => 'SNK',
-            'kategori_nama' => 'Snack/Makanan Ringan',
-            'created_at' => now()
-        ];*/
-        //DB::table('m_kategori')->insert($data);
-        //return 'Insert data baru berhasil';
-
-        //$row = DB::table('m_kategori')->where('kategori_kode', 'SNK') -> delete();
-        //return 'Delete data berhasil. Jumlah data yang dihapus: '. $row. ' baris';
 
         // Menampilkan halaman awal kategori
         $breadcrumb = (object) [
@@ -347,61 +337,62 @@ class KategoriController extends Controller
                 ]);
             }
         }
+
         return redirect('/');
     }
 
     public function export_excel()
-    {
-        //Ambil value kategori yang akan diexport
-        $kategori = KategoriModel::select(
-            'kategori_kode',
-            'kategori_nama',
-        )
-        ->orderBy('kategori_id')
-        ->get();
+     {
+         //Ambil value kategori yang akan diexport
+         $kategori = KategoriModel::select(
+             'kategori_kode',
+             'kategori_nama',
+         )
+         ->orderBy('kategori_id')
+         ->get();
+ 
+         //load library excel
+         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+         $sheet = $spreadsheet->getActiveSheet(); //ambil sheet aktif
+ 
+         $sheet->setCellValue('A1', 'No');
+         $sheet->setCellValue('B1', 'Kode Kategori');
+         $sheet->setCellValue('C1', 'Nama Kategori');
+         
+         $sheet->getStyle('A1:D1')->getFont()->setBold(true); // Set header bold
+ 
+         $no = 1; //Nomor value dimulai dari 1
+         $baris = 2; //Baris value dimulai dari 2
+         foreach ($kategori as $key => $value) {
+             $sheet->setCellValue('A' . $baris, $no);
+             $sheet->setCellValue('B' . $baris, $value->kategori_kode);
+             $sheet->setCellValue('C' . $baris, $value->kategori_nama);
+             $no++;
+             $baris++;
+         }
+ 
+         foreach (range('A', 'D') as $columnID) {
+             $sheet->getColumnDimension($columnID)->setAutoSize(true); //set auto size untuk kolom
+         }
+ 
+         $sheet->setTitle('Data Kategori'); //set judul sheet
+         $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
+         $filename = 'Data_kategori_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
+ 
+         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+         header('Content-Disposition: attachment; filename="' . $filename . '"');
+         header('Cache-Control: max-age=0');
+         header('Cache-Control: max-age=1');
+         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+         header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+         header('Cache-Control: cache, must-revalidate');
+         header('Pragma: public');
+ 
+         $writer->save('php://output'); //simpan file ke output
+         exit; //keluar dari scriptA
+     }
 
-        //load library excel
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet(); //ambil sheet aktif
-
-        $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Kode Kategori');
-        $sheet->setCellValue('C1', 'Nama Kategori');
-        
-        $sheet->getStyle('A1:D1')->getFont()->setBold(true); // Set header bold
-
-        $no = 1; //Nomor value dimulai dari 1
-        $baris = 2; //Baris value dimulai dari 2
-        foreach ($kategori as $key => $value) {
-            $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $value->kategori_kode);
-            $sheet->setCellValue('C' . $baris, $value->kategori_nama);
-            $no++;
-            $baris++;
-        }
-
-        foreach (range('A', 'D') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true); //set auto size untuk kolom
-        }
-
-        $sheet->setTitle('Data Kategori'); //set judul sheet
-        $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
-        $filename = 'Data_kategori_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        header('Cache-Control: max-age=1');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: cache, must-revalidate');
-        header('Pragma: public');
-
-        $writer->save('php://output'); //simpan file ke output
-        exit; //keluar dari scriptA
-    }
-
-    public function export_pdf(){
+     public function export_pdf(){
         $kategori = KategoriModel::select(
             'kategori_kode',
             'kategori_nama'
@@ -417,5 +408,11 @@ class KategoriController extends Controller
         $pdf->render(); // render pdf
 
         return $pdf->stream('Data Kategori Barang '.date('Y-m-d H-i-s').'.pdf');
+    }
+
+    public function show_ajax(string $id){
+        $kategori = KategoriModel::find($id);
+
+        return view('kategori.show_ajax', ['kategori' => $kategori]);
     }
 }

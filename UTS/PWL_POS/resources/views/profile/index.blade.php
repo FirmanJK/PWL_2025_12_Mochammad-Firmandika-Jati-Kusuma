@@ -8,9 +8,10 @@
             <div class="card-body box-profile">
                 <div class="text-center">
                     <img class="profile-user-img img-fluid img-circle" 
-                         src="{{ asset('storage/profile/' . ($user->profile_photo ?? 'Foto.jpg')) }}"
+                    <img src="{{ Auth::user()->profile_photo ? asset('public/storage/profile/'.Auth::user()->profile_photo) : asset('Foto.jpg') }}"
                          alt="User profile picture"
-                         style="width: 150px; height: 150px; object-fit: cover; border: 5px solid #e9ecef;">
+                         style="width: 150px; height: 150px; object-fit: cover; border: 5px solid #e9ecef;"
+                         onerror="this.onerror=null; this.src='{{ asset('Foto.jpg') }}'">
                 </div>
 
                 <h3 class="profile-username text-center">{{ $user->nama }}</h3>

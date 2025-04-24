@@ -13,7 +13,7 @@
                 <div class="form-group text-center">
                     <!-- Photo Preview Container -->
                     <img id="profile-preview" 
-                         src="{{ asset('storage/profile/' . (Auth::user()->profile_photo ?? 'Foto.jpg')) }}"
+                    <img src="{{ Auth::user()->profile_photo ? asset('storage/profile/'.Auth::user()->profile_photo) : asset('Foto.jpg') }}"
                          class="img-thumbnail mb-3"
                          style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
                     

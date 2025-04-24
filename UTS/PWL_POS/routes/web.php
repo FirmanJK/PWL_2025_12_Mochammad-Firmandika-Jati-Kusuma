@@ -230,13 +230,12 @@ Route::middleware(['auth'])->group(function () { //artinya semua route di dalam 
 
     //Semua bisa ke halaman dashboard
     Route::middleware(['authorize:ADM,MNG,STF,KSR,SPV'])->group(function () {
-        Route::middleware(['authorize:ADM,MNG,STF,KSR,SPV'])->group(function () {
-            Route::get('/profile', [ProfileController::class, 'profil'])->name('profil');  
-            Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-            Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-        });        
+        Route::get('/profile', [ProfileController::class, 'profil'])->name('profile');  
+        Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     });
 
+              
     // Artinya semua role di dalam group ini harus punya rle ADM (Administrator)
     Route::middleware(['authorize:ADM'])->group(function () {
         Route::group(['prefix' => 'level'], function () {
@@ -336,7 +335,7 @@ Route::middleware(['auth'])->group(function () { //artinya semua route di dalam 
 
     Route::middleware(['authorize:ADM,MNG,STF'])->group(function () {
         Route::group(['prefix' => 'barang'], function () {
-            Route::get('/', [BarangController::class, 'index']); // menampilkan halaman awal Barang
+            Route::get('/', [BarangController::class, 'index'])->name('barang.index'); // menampilkan halaman awal Barang
             Route::post('/list', [BarangController::class, 'list']); // menampilkan data Barang dalam bentuk json untuk datatable
             Route::get('/create', [BarangController::class, 'create']); // menampilkan halaman form tambah Barang
             Route::post('/', [BarangController::class, 'store']); // menyimpan data Barang baru

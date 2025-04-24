@@ -24,7 +24,7 @@ class BarangController extends Controller
             'title' => 'Daftar barang yang terdaftar dalam sistem'
         ];
 
-        $activeMenu = 'barang'; // set menu yang sedang aktif
+        $activeMenu = 'barang'; // set menu yang sedang aZSktif
         
         // Mengambil semua kategori untuk dropdown
         //$kategori = KategoriModel::all();
@@ -51,9 +51,7 @@ class BarangController extends Controller
             'harga_jual')
             ->with('kategori');
 
-        //if ($request->kategori_id) {
-        //    $barang->where('kategori_id', $request->kategori_id);
-        //}
+      
         $kategori_id = $request->input('filter_kategori'); 
         if (!empty($kategori_id)) {
             $barang->where('kategori_id', $kategori_id);
@@ -61,6 +59,9 @@ class BarangController extends Controller
 
         return DataTables::of($barang)
             ->addIndexColumn()
+            ->addColumn('stok', function($barang) {
+                return $barang->barang_stok; // Menggunakan accessor
+            })
             ->addColumn('aksi', function ($barang) { // menambahkan kolom aksi
                 // $btn = '<a href="' . url('/barang/' . $barang->barang_id) . '" class="btn btn-info btn-sm">Detail</a>';
                 // $btn .= '<a href="' . url('/barang/' . $barang->barang_id . '/edit') . '" class="btn btn-warning btn-sm">Edit</a>';
@@ -478,5 +479,11 @@ public function import_ajax(Request $request)
         $pdf->render(); // render pdf
 
         return $pdf->stream('Data Barang '.date('Y-m-d H-i-s').'.pdf');
+    }
+
+    public function show_ajax(string $id){
+        $barang = BarangModel::with('kategori')->find($id);
+
+        return view('barang.show_ajax', ['barang' => $barang]);
     }
 }

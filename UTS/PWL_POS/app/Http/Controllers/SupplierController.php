@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\SupplierModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
-use Barryvdh\DomPDF\Facade\Pdf;
 // use Illuminate\Support\Facades\Hash;
 
 
@@ -25,7 +25,7 @@ class SupplierController extends Controller
             'title' => 'Daftar supplier yang terdaftar dalam sistem'
         ];
 
-        $activeMenu = 'supplier'; // set menu yang sedang aktif
+        $activeMenu = 'supplier';
 
         return view('supplier.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
     }
@@ -57,7 +57,7 @@ class SupplierController extends Controller
             })->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html
             ->make(true);
     }
-    
+
     // Menampilkan halaman form tambah supplier
     public function create()
     {
@@ -276,12 +276,20 @@ class SupplierController extends Controller
         return redirect('/');
     }
 
-        public function import(){
-        return view('supplier.import');
-        }
+    public function show_ajax(string $id)
+    {
+        $supplier = SupplierModel::find($id);
 
-        public function import_ajax(Request $request)
-        {
+        return view('supplier.show_ajax', ['supplier' => $supplier]);
+    }
+
+    public function import()
+    {
+        return view('supplier.import');
+    }
+
+    public function import_ajax(Request $request)
+    {
         if ($request->ajax() || $request->wantsJson()) {
 
             $rules = [
@@ -354,8 +362,8 @@ class SupplierController extends Controller
             'supplier_nama',
             'supplier_alamat'
         )
-        ->orderBy('supplier_id')
-        ->get();
+            ->orderBy('supplier_id')
+            ->get();
 
         //load library excel
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
@@ -384,7 +392,7 @@ class SupplierController extends Controller
         }
 
         $sheet->setTitle('Data Supplier'); //set judul sheet
-        $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx'); //set writer
         $filename = 'Data_Supplier_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -400,15 +408,16 @@ class SupplierController extends Controller
         exit; //keluar dari scriptA
     }
 
-    public function export_pdf(){
+    public function export_pdf()
+    {
         $supplier = SupplierModel::select(
             'supplier_kode',
             'supplier_nama',
             'supplier_alamat'
         )
-        ->orderBy('supplier_id')
-        ->orderBy('supplier_kode')
-        ->get();
+            ->orderBy('supplier_id')
+            ->orderBy('supplier_kode')
+            ->get();
 
         // use Barryvdh\DomPDF\Facade\Pdf;
         $pdf = PDF::loadView('supplier.export_pdf', ['supplier' => $supplier]);
@@ -416,6 +425,6 @@ class SupplierController extends Controller
         $pdf->setOption("isRemoteEnabled", true); // set true jika ada gambar dari url
         $pdf->render(); // render pdf
 
-        return $pdf->stream('Data Supplier '.date('Y-m-d H-i-s').'.pdf');
+        return $pdf->stream('Data Supplier ' . date('Y-m-d H-i-s') . '.pdf');
     }
 }

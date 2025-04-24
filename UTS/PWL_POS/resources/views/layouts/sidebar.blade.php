@@ -3,12 +3,14 @@
         <!-- Profile Picture -->
         <div class="user-panel d-flex align-items-center mt-3 mb-3">
             <a href="{{ url('/profile') }}" class="image mb-2 position-relative">
-                    <img src="{{ asset('storage/profile/' . (Auth::user()->profile_photo ?? 'Foto.jpg')) }}"
+                <img src="{{ Auth::user()->profile_photo ? asset('storage/profile/'.Auth::user()->profile_photo) : asset('Foto.jpg') }}"
                         class="img-circle elevation-2"
                         alt="User Image"
-                        style="width: 30px; height: 30px; object-fit: cover; border: 2px solid white;">
+                        style="width: 30px; height: 30px; object-fit: cover; border: 2px solid white;"
+                        onerror="this.onerror=null; this.src='{{ asset('Foto.jpg') }}'">
             </a>
-            <div class="info">
+            <div class="info"
+            onerror="this.onerror=null; this.src='{{ asset('Foto.jpg') }}'">
                 <span style="color:white">{{ Auth::user()->nama }}</span>
             </div>
         </div>
@@ -69,6 +71,11 @@
                   <p>Stok Barang</p>
               </a>
           </li>
+          <li class="nav-item">
+            <a href="{{ url('/penjualan') }}" class="nav-link {{ ($activeMenu == 'penjualan') ? 'active' : '' }}">
+                <i class="nav-icon fas fa-cash-register"></i>
+                <p>Transaksi Penjualan</p>
+            </a>
          
           <li class="nav-header">Data Supplier</li>
           <li class="nav-item">
@@ -77,8 +84,7 @@
                   <p>Data Supplier</p>
               </a>
           </li>
-
-          
+        </li>
           <li class="nav-header"></li>
           <li class="nav-item">
               <a href="{{ url('/logout') }}" class="nav-link bg-danger">

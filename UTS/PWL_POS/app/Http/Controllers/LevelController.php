@@ -5,24 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\LevelModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class LevelController extends Controller
 {
     public function index()
     {
     
-        //DB::insert('insert into m_level (level_kode, level_nama, created_at) values (?, ?, ?)', ['CUS', 'Pelanggan', now()]);
-        //return 'Insert data baru ditambahkan';
-
-        //$row = DB::update('update m_level set level_nama = ? where level_kode = ?', ['Customer', 'CUS']);
-        //return 'Update data berhasil.Jumlah data yang diupdate: ' . $row. ' baris'; ;
-
-        //$row = DB::delete('delete from m_level where level_kode = ?', ['CUS']);
-        //return 'Delete data berhasil. Jumlah data yang dihapus: '. $row.' baris';
 
         $breadcrumb = (object) [
             'title' => 'Daftar Level',
@@ -103,7 +95,7 @@ class LevelController extends Controller
         return redirect('/level')->with('success', 'Data level berhasil disimpan');
     }
 
-    // Menampilkan detail level
+
     public function show(string $id)
     {
         $level = LevelModel::find($id);
@@ -146,7 +138,6 @@ class LevelController extends Controller
     {
         $request->validate([
             // level_kode harus diisi, berupa string, minimal 3 karakter,
-            // dan bernilai unik di tabel m_level kolom level_kode kecuali untuk level dengan id yang sedang diedit
             'level_kode' => 'required|string|min:3|unique:m_level,level_kode,' . $id . ',level_id',
             'level_nama' => 'required|string|max:100', // nama harus diisi, berupa string, dan maksimal 100 karakter
         ]);
@@ -354,61 +345,62 @@ class LevelController extends Controller
                 ]);
             }
         }
+    
         return redirect('/');
     }
 
     public function export_excel()
-    {
-        //Ambil value barang yang akan diexport
-        $level = LevelModel::select(
-            'level_kode',
-            'level_nama'
-        )
-        ->orderBy('level_id')
-        ->get();
+     {
+         //Ambil value barang yang akan diexport
+         $level = LevelModel::select(
+             'level_kode',
+             'level_nama'
+         )
+         ->orderBy('level_id')
+         ->get();
+ 
+         //load library excel
+         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+         $sheet = $spreadsheet->getActiveSheet(); //ambil sheet aktif
+ 
+         $sheet->setCellValue('A1', 'No');
+         $sheet->setCellValue('B1', 'Kode Level');
+         $sheet->setCellValue('C1', 'Nama Level');
+ 
+         $sheet->getStyle('A1:C1')->getFont()->setBold(true); // Set header bold
+ 
+         $no = 1; //Nomor value dimulai dari 1
+         $baris = 2; //Baris value dimulai dari 2
+         foreach ($level as $key => $value) {
+             $sheet->setCellValue('A' . $baris, $no);
+             $sheet->setCellValue('B' . $baris, $value->level_kode);
+             $sheet->setCellValue('C' . $baris, $value->level_nama);
+             $no++;
+             $baris++;
+         }
+ 
+         foreach (range('A', 'C') as $columnID) {
+             $sheet->getColumnDimension($columnID)->setAutoSize(true); //set auto size untuk kolom
+         }
+ 
+         $sheet->setTitle('Data Level'); //set judul sheet
+         $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
+         $filename = 'Data_Level_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
+ 
+         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+         header('Content-Disposition: attachment; filename="' . $filename . '"');
+         header('Cache-Control: max-age=0');
+         header('Cache-Control: max-age=1');
+         header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+         header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+         header('Cache-Control: cache, must-revalidate');
+         header('Pragma: public');
+ 
+         $writer->save('php://output'); //simpan file ke output
+         exit; //keluar dari scriptA
+     }
 
-        //load library excel
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet(); //ambil sheet aktif
-
-        $sheet->setCellValue('A1', 'No');
-        $sheet->setCellValue('B1', 'Kode Level');
-        $sheet->setCellValue('C1', 'Nama Level');
-
-        $sheet->getStyle('A1:C1')->getFont()->setBold(true); // Set header bold
-
-        $no = 1; //Nomor value dimulai dari 1
-        $baris = 2; //Baris value dimulai dari 2
-        foreach ($level as $key => $value) {
-            $sheet->setCellValue('A' . $baris, $no);
-            $sheet->setCellValue('B' . $baris, $value->level_kode);
-            $sheet->setCellValue('C' . $baris, $value->level_nama);
-            $no++;
-            $baris++;
-        }
-
-        foreach (range('A', 'C') as $columnID) {
-            $sheet->getColumnDimension($columnID)->setAutoSize(true); //set auto size untuk kolom
-        }
-
-        $sheet->setTitle('Data Level'); //set judul sheet
-        $writer = IOFactory ::createWriter($spreadsheet, 'Xlsx'); //set writer
-        $filename = 'Data_Level_' . date('Y-m-d_H-i-s') . '.xlsx'; //set nama file
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        header('Cache-Control: max-age=1');
-        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-        header('Cache-Control: cache, must-revalidate');
-        header('Pragma: public');
-
-        $writer->save('php://output'); //simpan file ke output
-        exit; //keluar dari scriptA
-    }
-
-    public function export_pdf(){
+     public function export_pdf(){
         $level = LevelModel::select(
             'level_kode',
             'level_nama',
@@ -424,5 +416,11 @@ class LevelController extends Controller
         $pdf->render(); // render pdf
 
         return $pdf->stream('Data Level '.date('Y-m-d H-i-s').'.pdf');
+    }
+
+    public function show_ajax(string $id)
+    {
+        $level = LevelModel::find($id);
+        return view('level.show_ajax', ['level' => $level]);
     }
 }    

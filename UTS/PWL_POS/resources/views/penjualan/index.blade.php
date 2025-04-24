@@ -5,11 +5,11 @@
     <div class="card-header">
         <h3 class="card-title">{{ $page->title }}</h3>
         <div class="card-tools">
-            <button onclick="modalAction('{{ url('/penjualan/import') }}')" class="btn btn-sm btn-info mt-1">Import Penjualan</button>
+            <button onclick="modalAction('{{ url('/penjualan/import') }}')" class="btn btn-info">Import Penjualan</button>
             {{-- <a class="btn btn-sm btn-primary mt-1" href="{{ url('penjualan/create') }}">Tambah</a> --}}
-            <a href="{{ url('/penjualan/export_excel') }}" class="btn btn-sm btn-primary mt-1"><i class="fa fa-file-excel"></i> Export Penjualan</a>
-            <a href="{{ url('/penjualan/export_pdf') }}" class="btn btn-sm btn-warning mr-1"><i class="fa fa-file-pdf"></i> Export Penjualan</a>
-            <button onclick="modalAction('{{ url('/penjualan/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+            <a href="{{ url('/penjualan/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i> Export Penjualan</a>
+            <a href="{{ url('/penjualan/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i> Export Penjualan</a>
+            <button onclick="modalAction('{{ url('/penjualan/create_ajax') }}')" class="btn btn-success">Tambah Ajax</button>
         </div>
     </div>
     <div class="card-body">
@@ -19,24 +19,6 @@
         @if (session('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-
-        <!-- Filter Berdasarkan User -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group row">
-                    <label class="col-1 control-label col-form-label">Filter:</label>
-                    <div class="col-3">
-                        <select class="form-control" id="user_id" name="user_id">
-                            <option value="">- Semua -</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->user_id }}">{{ $user->username }}</option>
-                            @endforeach
-                        </select>
-                        <small class="form-text text-muted">Filter berdasarkan User</small>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <table class="table table-bordered table-striped table-hover table-sm" id="table_penjualan">
             <thead>
@@ -93,7 +75,7 @@
                 searchable: true
             },
             {
-                data: "user.nama",
+                data: "user",
                 orderable: false,
                 searchable: true
             },
