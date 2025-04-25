@@ -234,7 +234,7 @@ Route::middleware(['auth'])->group(function () { //artinya semua route di dalam 
         Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     });
-
+//
               
     // Artinya semua role di dalam group ini harus punya rle ADM (Administrator)
     Route::middleware(['authorize:ADM'])->group(function () {
