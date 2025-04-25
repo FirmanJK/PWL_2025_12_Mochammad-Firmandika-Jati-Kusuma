@@ -480,10 +480,4 @@ public function import_ajax(Request $request)
 
         return $pdf->stream('Data Barang '.date('Y-m-d H-i-s').'.pdf');
     }
-
-    public function show_ajax(string $id){
-        $barang = BarangModel::with('kategori')->find($id);
-
-        return view('barang.show_ajax', ['barang' => $barang]);
-    }
 }

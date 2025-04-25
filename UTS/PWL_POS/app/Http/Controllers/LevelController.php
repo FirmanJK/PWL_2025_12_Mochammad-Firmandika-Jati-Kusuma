@@ -14,9 +14,7 @@ class LevelController extends Controller
 {
     public function index()
     {
-    
-
-        $breadcrumb = (object) [
+            $breadcrumb = (object) [
             'title' => 'Daftar Level',
             'list' => ['Home', 'Level']
         ];
@@ -416,11 +414,5 @@ class LevelController extends Controller
         $pdf->render(); // render pdf
 
         return $pdf->stream('Data Level '.date('Y-m-d H-i-s').'.pdf');
-    }
-
-    public function show_ajax(string $id)
-    {
-        $level = LevelModel::find($id);
-        return view('level.show_ajax', ['level' => $level]);
     }
 }    

@@ -194,38 +194,52 @@ class UserController extends Controller
                 'title' => 'Daftar User',
                 'list' => ['Home', 'User']
             ];
-
+        
             $page = (object) [
                 'title' => 'Daftar user yang terdaftar dalam sistem'
             ];
-
-
-            $activeMenu = 'user'; // set menu yang sedang aktif
-
-            $level = LevelModel::all(); // ambil data level untuk filter level
-
-            return view('user.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'level'=> $level,'activeMenu' => $activeMenu]);
+        
+            $activeMenu = 'user';
+        
+            // Ambil data level untuk filter
+            $level = LevelModel::all();
+            
+            // Jika user adalah manager (level_id 2), hanya tampilkan user dengan level_id >= 2
+            if(auth()->user()->level_id == 2) {
+                $level = LevelModel::where('level_id', '>=', 2)->get();
+            }
+        
+            return view('user.index', [
+                'breadcrumb' => $breadcrumb, 
+                'page' => $page, 
+                'level' => $level,
+                'activeMenu' => $activeMenu
+            ]);
         }
 
         // Ambil data user dalam bentuk json untuk datatables 
         public function list(Request $request) 
         { 
-            $users = UserModel::select('user_id', 'username', 'nama', 'level_id') 
-                  ->with('level'); 
+            $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
+                      ->with('level');
+            
+            // Jika user adalah manager, hanya tampilkan user dengan level_id >= 2
+            if(auth()->user()->level_id == 2) {
+                $users->where('level_id', '>=', 2);
+            }
             
             // Filter data user berdasarkan level_id
             if($request->level_id) {
                 $users->where('level_id', $request->level_id);
             }
-            return DataTables::of($users) 
-                // menambahkan kolom index / no urut (default nama kolom: DT_RowIndex) 
+            
+            return DataTables::of($users)
                 ->addIndexColumn()  
-                ->addColumn('aksi', function ($user) {  // menambahkan kolom aksi 
-                    //$btn  = '<a href="'.url('/user/' . $user->user_id).'" class="btn btn-info btn sm">Detail</a> '; 
-                    //$btn .= '<a href="'.url('/user/' . $user->user_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> '; 
-                    //$btn .= '<form class="d-inline-block" method="POST" action="' .
-                    //url('/user/' . $user->user_id) . '">' . csrf_field() . method_field('DELETE') .
-                    //'<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';
+                ->addColumn('aksi', function ($user) {
+                    // Jika user adalah manager, jangan tampilkan aksi untuk admin (level_id 1)
+                    if(auth()->user()->level_id == 2 && $user->level_id == 1) {
+                        return '';
+                    }
                     
                     $btn = '<button onclick="modalAction(\'' . url('/user/' . $user->user_id .
                     '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
@@ -233,10 +247,11 @@ class UserController extends Controller
                     '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
                     $btn .= '<button onclick="modalAction(\'' . url('/user/' . $user->user_id .
                     '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
-
-             return $btn;
-            })->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah html 
-            ->make(true); 
+        
+                    return $btn;
+                })
+                ->rawColumns(['aksi'])
+                ->make(true); 
         }
         
         // Menampilkan halaman form tambah user
@@ -477,11 +492,6 @@ class UserController extends Controller
         return redirect('/');
     }
 
-    public function show_ajax(string $id){
-        $user = UserModel::with('level')->find($id);
-
-        return view('user.show_ajax', ['user' => $user]);
-    }
     //----------------------------------------------------------Jobsheet 8----------------------------------------------------
     //----------------------------------------------------------Praktikum 1----------------------------------------------------
     public function import() {
